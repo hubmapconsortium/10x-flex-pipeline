@@ -8,7 +8,7 @@ from typing import Dict, Iterable, Optional, Tuple
 
 import anndata
 import manhole
-import json`
+import json
 from common import (
     BARCODE_UMI_FASTQ_PATH,
     TRANSCRIPT_FASTQ_GZ_PATH,
@@ -40,6 +40,11 @@ class EnsemblHugoMapper:
         self = cls()
         with smart_open(path) as f:
             self.mapping.update(json.load(f))
+
+        versioned_ensembl_ids = set(self.mapping.keys())
+        unversioned_mapping_dict = {key.split('.')[0]:self.mapping[key] for key in versioned_ensembl_ids}
+        self.mapping.update(unversioned_mapping_dict)
+
         return self
 
     def annotate(self, data: anndata.AnnData):

@@ -11,16 +11,8 @@ inputs:
     type: File
     inputBinding:
       position: 1
-  bam_file:
-    type: File
-    inputBinding:
-      position: 2
 outputs:
   scanpy_qc_results:
     type: File
     outputBinding:
       glob: qc_results.hdf5
-  qc_metrics:
-    type: File
-    outputBinding:
-      glob: alignment_qc_results.json

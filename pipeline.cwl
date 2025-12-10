@@ -9,11 +9,15 @@ requirements:
 inputs:
   data_directory:
     label: "Directory containing 10x h5 file"
-    type: Directory[]
+    type: Directory
+  assay:
+    label: "scRNA-seq assay"
+    type: string
+    default: "10x_v3"
 
 outputs:
   count_matrix_h5ad:
-    outputSource: convert-h5ad/h5ad_file
+    outputSource: convert_h5ad/h5ad_file
     type: File
     label: "Unfiltered count matrix from BWA and umi_tools, converted to H5AD, spliced and unspliced counts"
   scanpy_qc_results:
@@ -56,7 +60,7 @@ steps:
   convert_h5ad:
     in:
       data_directory:
-        source: data_diretory
+        source: data_directory
     out:
       - h5ad_file
     run: steps/convert-h5ad.cwl

@@ -7,39 +7,19 @@ requirements:
   SubworkflowFeatureRequirement: {}
   ScatterFeatureRequirement: {}
 inputs:
-  fastq_dir:
-    label: "Directory containing FASTQ files"
+  data_directory:
+    label: "Directory containing 10x h5 file"
     type: Directory[]
-  metadata_dir:
-    label: "Directory containing and metadata.tsv"
-    type: Directory
-  assay:
-    label: "scRNA-seq assay"
-    type: string
-    default: "10x_v3"
-  threads:
-    label: "Number of threads for alignment"
-    type: int
-    default: 1
-  organism:
-    type: string?
+
 outputs:
   count_matrix_h5ad:
-    outputSource: quantification/h5ad_file
+    outputSource: convert-h5ad/h5ad_file
     type: File
     label: "Unfiltered count matrix from BWA and umi_tools, converted to H5AD, spliced and unspliced counts"
-  fastqc_dir:
-    outputSource: fastqc/fastqc_dir
-    type: Directory[]
-    label: "Directory of FastQC output files, mirroring input directory structure"
   scanpy_qc_results:
     outputSource: compute_qc_results/scanpy_qc_results
     type: File
     label: "Quality control metrics from Scanpy"
-  qc_report:
-    outputSource: compute_qc_results/qc_metrics
-    type: File
-    label: "Quality control report in JSON format"
   dispersion_plot:
     outputSource: scanpy_analysis/dispersion_plot
     type: File
@@ -73,52 +53,19 @@ outputs:
     type: File
     label: "Cluster marker genes, logreg method"
 steps:
-  adjust_barcodes:
+  convert_h5ad:
     in:
-      metadata_dir:
-        source: metadata_dir
-      fastq_dir:
-        source: fastq_dir
-    out: [adj_fastq_dir]
-    run: steps/adjust-barcodes.cwl
-  trim_reads:
-    in:
-      adj_fastq_dir:
-        source: adjust_barcodes/adj_fastq_dir
-      threads:
-        source: threads
-    out: [trimmed_fastq_dir]
-    run: steps/trim-reads.cwl
-  quantification:
-    in:
-      trimmed_fastq_dir:
-        source: trim_reads/trimmed_fastq_dir
-      threads:
-        source: threads
-      organism:
-        source: organism
+      data_directory:
+        source: data_diretory
     out:
       - h5ad_file
-      - bam_file
-    run: steps/quantification.cwl
-  fastqc:
-    scatter: fastq_dir
-    scatterMethod: dotproduct
-    in:
-      fastq_dir:
-        source: fastq_dir
-      threads:
-        source: threads
-    out:
-      - fastqc_dir
-    run: salmon-rnaseq/steps/fastqc.cwl
-    label: "Run fastqc on all fastq files in fastq directory"
+    run: steps/convert-h5ad.cwl
   scanpy_analysis:
     in:
       assay:
         source: assay
       h5ad_file:
-        source: quantification/h5ad_file
+        source: convert_h5ad/h5ad_file
     out:
       - filtered_data_h5ad
       - umap_plot
@@ -132,12 +79,9 @@ steps:
   compute_qc_results:
     in:
       h5ad_primary:
-        source: quantification/h5ad_file
-      bam_file:
-        source: quantification/bam_file
+        source: convert_h5ad/h5ad_file
     out:
       - scanpy_qc_results
-      - qc_metrics
     run: steps/compute-qc-metrics.cwl
     label: "Compute QC metrics"
 

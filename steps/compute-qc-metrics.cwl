@@ -3,7 +3,7 @@ class: CommandLineTool
 label: Compute QC metrics
 requirements:
   DockerRequirement:
-    dockerPull: hubmap/10x-flex-analysis:latest
+    dockerPull: hubmap/10x-flex-analysis:0.1
 baseCommand: /opt/compute_qc_metrics.py
 
 inputs:

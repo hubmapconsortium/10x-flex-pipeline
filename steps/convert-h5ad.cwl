@@ -2,7 +2,7 @@ cwlVersion: v1.0
 class: CommandLineTool
 requirements:
   DockerRequirement:
-    dockerPull: hubmap/10x-flex-analysis
+    dockerPull: hubmap/10x-flex-analysis:0.1
   ResourceRequirement:
     ramMin: 28672
 baseCommand: /opt/convert_h5ad.py

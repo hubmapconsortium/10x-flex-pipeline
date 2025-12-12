@@ -39,4 +39,4 @@ if __name__ == "__main__":
     p.add_argument("data_directory", type=Path)
     args = p.parse_args()
 
-    main(args.h5ad_primary)
+    main(args.data_directory)
